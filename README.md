@@ -44,7 +44,24 @@ ages are derived; files of male players already contain the opponents' ages.
 
 ## Package structure
 
-*(To be completed.)*
+```
+hw03-3-winnyjingyingwen/
+├── .gitignore
+├── README.md                      # project overview (this file)
+├── instructions.md                # HW3 instructions
+├── pyproject.toml                 # package metadata and dependencies (used by pip)
+└── tennisages/                    # the Python package
+    ├── __init__.py                # package entry point (version number)
+    ├── career_data.py             # download and clean a player's career matches
+    └── tests/
+        ├── __init__.py
+        ├── test_career_data.py    # offline tests for career_data.py
+        └── data/
+            ├── FemalePlayerCareer.js  # mock female career file (from the instructions)
+            └── MalePlayerCareer.js    # mock male career file (from the instructions)
+```
+
+*(The plotting module and its tests will be added in later steps.)*
 
 ## Running the tests
 
