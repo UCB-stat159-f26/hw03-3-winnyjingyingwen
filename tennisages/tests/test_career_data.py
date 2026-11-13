@@ -12,7 +12,7 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from tennisages import career_data
+from tennisages import career_data, get_career_data
 
 MOCK_DIR = Path(__file__).parent / "data"
 DAYS_PER_YEAR = 365.25
@@ -228,3 +228,24 @@ def test_download_text_turns_network_failure_into_connection_error(monkeypatch):
     monkeypatch.setattr(urllib.request, "urlopen", offline)
     with pytest.raises(ConnectionError, match="check your internet connection"):
         career_data._download_text("https://www.tennisabstract.com/")
+
+
+def fake_site(career_js):
+    """Stand-in for tennisabstract.com that serves a mock career file and player page."""
+    def download(url):
+        return career_js if url.endswith("Career.js") else MOCK_PLAYER_PAGE
+    return download
+
+
+def test_get_career_data_end_to_end_with_mock_site(monkeypatch, female_js):
+    monkeypatch.setattr(career_data, "_download_text", fake_site(female_js))
+    serena = get_career_data("serena williams")
+    assert list(serena.columns) == career_data.OUTPUT_COLUMNS
+    assert len(serena) == 3
+    assert set(serena["player"]) == {"Serena Williams"}  # full name from the player page
+
+
+def test_get_career_data_unknown_player(monkeypatch):
+    monkeypatch.setattr(career_data, "_download_text", not_found)
+    with pytest.raises(ValueError, match="No career data found for player 'GastonSanchez'"):
+        get_career_data("GastonSanchez")
