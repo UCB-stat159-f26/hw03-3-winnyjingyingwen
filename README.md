@@ -31,8 +31,6 @@ serena = get_career_data("serena williams")
 plot_age_difference(serena)
 ```
 
-*(Examples and output to be completed.)*
-
 ## Data
 
 The data come from each player's career file on Tennis Abstract, e.g.
@@ -47,28 +45,25 @@ ages are derived; files of male players already contain the opponents' ages.
 ```
 hw03-3-winnyjingyingwen/
 ├── .gitignore
-├── README.md                      # project overview (this file)
-├── instructions.md                # HW3 instructions
-├── pyproject.toml                 # package metadata and dependencies (used by pip)
-└── tennisages/                    # the Python package
-    ├── __init__.py                # package entry point (version number)
-    ├── career_data.py             # download and clean a player's career matches
+├── README.md                     
+├── instructions.md               
+├── pyproject.toml                 
+└── tennisages/                   
+    ├── __init__.py               
+    ├── career_data.py             
     └── tests/
         ├── __init__.py
-        ├── test_career_data.py    # offline tests for career_data.py
+        ├── test_career_data.py    
         └── data/
-            ├── FemalePlayerCareer.js  # mock female career file (from the instructions)
-            └── MalePlayerCareer.js    # mock male career file (from the instructions)
+            ├── FemalePlayerCareer.js  
+            └── MalePlayerCareer.js
 ```
 
-*(The plotting module and its tests will be added in later steps.)*
 
 ## Running the tests
 
 The tests use mock JS content and never contact tennisabstract.com.
 
-*(Instructions to be completed.)*
 
 ## Reflections
 
-*(To be completed.)*
