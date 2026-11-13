@@ -7,7 +7,6 @@ Only ``plot_age_difference()`` is public.
 """
 
 import math
-
 import matplotlib.pyplot as plt
 import pandas as pd
 
@@ -121,3 +120,4 @@ def _y_tick_label(tick, top_tick):
         return "Same age"
     label = f"{tick:+d}"
     return f"{label} years" if tick == top_tick else label
+
