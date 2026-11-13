@@ -7,6 +7,7 @@ This module downloads the file and calculates the player's age, their opponent's
 Only ``get_career_data()`` is the only public function.
 """
 
+import json
 import re
 
 
@@ -26,3 +27,16 @@ def _capitalize(word):
     if word.isupper() or word.islower():
         return word.capitalize()
     return word[0].upper() + word[1:]
+
+
+def _extract_match_rows(career_js):
+    """Return the list of match arrays stored in the career JS text.
+
+    The text looks like ``var morematchmx = [["19951030", ...], [...]];``.
+    The part after ``=`` is valid JSON once trailing commas are removed.
+    """
+    array_match = re.search(r"=\s*(\[.*\])", career_js, flags=re.DOTALL)
+    if array_match is None:
+        raise ValueError("No match array ('var morematchmx = [...]') found in the career JS text")
+    array_text = re.sub(r",\s*\]", "]", array_match.group(1))  # drop trailing commas
+    return json.loads(array_text)
