@@ -1,0 +1,28 @@
+   [build-system]
+   requires = ["setuptools>=77"]
+   build-backend = "setuptools.build_meta"
+
+   [project]
+   name = "tennisages"
+   version = "0.1.0"
+   description = "Get a tennis player's career matches from Tennis Abstract and plot their age against their opponents' ages."
+   readme = "README.md"
+   authors = [{ name = "Jingying Wen" }]
+   requires-python = ">=3.10"
+
+   # Every third-party package imported by tennisages must be listed here,
+   # otherwise `pip install` succeeds but `import tennisages` fails.
+   dependencies = [
+       "pandas",
+       "matplotlib",
+   ]
+
+   [project.optional-dependencies]
+   test = ["pytest"]
+
+   [tool.setuptools]
+   packages = ["tennisages"]
+
+   [tool.pytest.ini_options]
+   testpaths = ["tennisages/tests"]
+   
