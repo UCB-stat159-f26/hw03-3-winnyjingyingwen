@@ -9,8 +9,22 @@ Only ``get_career_data()`` is the only public function.
 
 import json
 import re
+import urllib.error
+import urllib.request
+from http import HTTPStatus
 
 import pandas as pd
+
+BASE_URL = "https://www.tennisabstract.com"
+CAREER_JS_URL = BASE_URL + "/jsmatches/{name}Career.js"
+PLAYER_PAGE_URL = BASE_URL + "/cgi-bin/player.cgi?p={name}"
+REQUEST_HEADERS = {"User-Agent": "Mozilla/5.0"}  # the site may refuse Python's default agent
+TIMEOUT_SECONDS = 60
+UNKNOWN_PLAYER_MESSAGE = (
+    "No career data found for player '{player}' (looked for {url}). "
+    "Check the spelling, e.g. 'Serena Williams' or 'Rafael Nadal'. "
+    "Note that not every player has a career file on tennisabstract.com."
+)
 
 DATE_FORMAT = "%Y%m%d"  # dates in the JS files look like "19951030"
 DAYS_PER_YEAR = 365.25
@@ -134,3 +148,30 @@ def _extract_player_info(player_page, player_name):
     name_match = re.search(r"var fullname\s*=\s*'([^']+)'", player_page)
     full_name = name_match.group(1) if name_match else player_name
     return full_name, pd.to_datetime(dob_match.group(1), format=DATE_FORMAT)
+
+
+def _download_text(url):
+    """Return the text found at ``url``.
+
+    HTTP errors (such as 404 Not Found) are passed on to the caller; other
+    connection problems become a ConnectionError with a readable message.
+    """
+    request = urllib.request.Request(url, headers=REQUEST_HEADERS)
+    try:
+        with urllib.request.urlopen(request, timeout=TIMEOUT_SECONDS) as response:
+            return response.read().decode("utf-8", errors="replace")
+    except urllib.error.HTTPError:
+        raise
+    except urllib.error.URLError as error:
+        raise ConnectionError(f"Could not reach {url} ({error.reason}); check your internet connection") from None
+
+
+def _download_career_js(url_name, player_name):
+    """Download a player's career JS file, with a clear error for unknown players."""
+    url = CAREER_JS_URL.format(name=url_name)
+    try:
+        return _download_text(url)
+    except urllib.error.HTTPError as error:
+        if error.code != HTTPStatus.NOT_FOUND:
+            raise
+        raise ValueError(UNKNOWN_PLAYER_MESSAGE.format(player=player_name, url=url)) from None

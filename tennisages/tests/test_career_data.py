@@ -5,6 +5,8 @@ files in tests/data/ (FemalePlayerCareer.js and MalePlayerCareer.js).
 """
 
 import json
+import urllib.error
+import urllib.request
 from pathlib import Path
 
 import pandas as pd
@@ -17,13 +19,17 @@ DAYS_PER_YEAR = 365.25
 SERENA_BIRTH_DATE = pd.Timestamp("1981-09-26")  # the female mock rows are hers
 NADAL_BIRTH_DATE = pd.Timestamp("1986-06-03")   # the male mock rows are his
 
-# A few lines of the kind found on a tennisabstract.com player page
 MOCK_PLAYER_PAGE = """
 var nameparam = 'SerenaWilliams';
 var fullname = 'Serena Williams';
 var dob = 19810926;
 var hand = 'R';
 """
+
+
+def not_found(url):
+    """Imitate the 404 error that tennisabstract.com returns for unknown players."""
+    raise urllib.error.HTTPError(url, 404, "Not Found", hdrs=None, fp=None)
 
 
 @pytest.fixture
@@ -200,3 +206,25 @@ def test_extract_player_info_without_birth_date_raises_error():
     page = MOCK_PLAYER_PAGE.replace("var dob = 19810926;", "")
     with pytest.raises(ValueError, match="date of birth of 'serena williams'"):
         career_data._extract_player_info(page, "serena williams")
+
+
+def test_download_career_js_unknown_player_has_clear_message(monkeypatch):
+    monkeypatch.setattr(career_data, "_download_text", not_found)
+    with pytest.raises(ValueError, match="No career data found for player 'Gaston Sanchez'"):
+        career_data._download_career_js("GastonSanchez", "Gaston Sanchez")
+
+
+def test_download_career_js_builds_the_career_url(monkeypatch):
+    requested_urls = []
+    monkeypatch.setattr(career_data, "_download_text", lambda url: requested_urls.append(url) or "")
+    career_data._download_career_js("SerenaWilliams", "serena williams")
+    assert requested_urls == ["https://www.tennisabstract.com/jsmatches/SerenaWilliamsCareer.js"]
+
+
+def test_download_text_turns_network_failure_into_connection_error(monkeypatch):
+    def offline(*args, **kwargs):
+        raise urllib.error.URLError("no internet")
+
+    monkeypatch.setattr(urllib.request, "urlopen", offline)
+    with pytest.raises(ConnectionError, match="check your internet connection"):
+        career_data._download_text("https://www.tennisabstract.com/")
