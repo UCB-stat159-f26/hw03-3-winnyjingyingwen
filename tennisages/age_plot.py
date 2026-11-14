@@ -24,23 +24,11 @@ SOURCE_POSITION = (0.01, 0.01)
 
 
 def plot_age_difference(career_data):
-    """Scatter plot of a player's age against the age gap with each opponent.
+    """Scatter plot of a player's age vs. the age gap with each opponent.
 
-    Parameters
-    ----------
-    career_data : pandas.DataFrame
-        Data frame returned by ``get_career_data()``.
-
-    Returns
-    -------
-    matplotlib.axes.Axes
-        The axes of the plot. In a script, call ``matplotlib.pyplot.show()``
-        to display it; in Jupyter it is displayed automatically.
-
-    Raises
-    ------
-    TypeError, ValueError
-        If ``career_data`` is not a data frame from ``get_career_data()``.
+    career_data: the data frame returned by get_career_data(). Returns the
+    matplotlib Axes (call plt.show() in a script); raises TypeError or
+    ValueError if career_data cannot be plotted.
     """
     _check_career_data(career_data)
     player = career_data["player"].iloc[0]
