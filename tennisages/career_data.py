@@ -47,27 +47,11 @@ OUTPUT_COLUMNS = [
 
 
 def get_career_data(player_name):
-    """Get the clean career-match data of a tennis player from tennisabstract.com.
+    """Download and clean a player's career matches from tennisabstract.com.
 
-    Parameters
-    ----------
-    player_name : str
-        The player's name, e.g. "serena williams", "Serena Williams" or
-        "SerenaWilliams".
-
-    Returns
-    -------
-    pandas.DataFrame
-        One row per match, sorted by date, with the columns ``player``,
-        ``match_date``, ``tournament``, ``surface``, ``round``, ``result``
-        ("won" or "lost"), ``opponent``, ``player_age``, ``opponent_age``
-        and ``age_difference`` (player's age minus opponent's age, in years;
-        positive when the player was older).
-
-    Raises
-    ------
-    ValueError
-        If tennisabstract.com has no career data for ``player_name``.
+    player_name: e.g. "serena williams", "Serena Williams" or "SerenaWilliams".
+    Returns one row per match (columns are listed in the README) and raises
+    ValueError if the player has no career data.
     """
     url_name = _format_player_name(player_name)
     career_js = _download_career_js(url_name, player_name)
